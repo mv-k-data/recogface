@@ -1,0 +1,29 @@
+.result-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    cursor: pointer; /* Додаємо курсор для візуалізації клікабельності */
+}
+.result-item img {
+    width: 25px;
+    height: 25px;
+    margin-right: 10px;
+}
+.result-item div {
+    flex-grow: 1;
+}
+.result-item div p {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+.result-item div a {
+    font-size: 12px;
+    display:none; /* Прибираємо видимість посилання */
+}
+img{
+    max-width: 200px;
+    max-height: 200px;
+}
+.js-result-item{
+  cursor: pointer;
+}

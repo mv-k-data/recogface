@@ -1,0 +1,13 @@
+{% macro render_item(items) %}
+    {% for item in items %}
+        <div class="col" >
+            <div class="card h-100 js-result-item" data-href="{{ item.url }}">
+                <img src="{{ url_for('static', filename='images/' + item.image) }}" class="rounded mx-auto d-block" alt="...">
+                <div class="card-body">
+                <p class="card-text">{{ item.title }}</p>
+                <span class="btn btn-link text-wrap text-break">{{ item.url }}</span>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endmacro %}
