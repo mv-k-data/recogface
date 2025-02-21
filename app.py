@@ -5,10 +5,10 @@ import os
 import uuid
 
 app = Flask(__name__)
-ORIGIN_FILE_NAME = 'origin'  
-UPLOAD_FOLDER = 'uploads'  
+ORIGINAL_FILE_NAME = 'original'  
+REQUESTS_FOLDER = 'requests'  
 ALLOWED_EXTENSIONS = ['gif', 'jpg', 'jpeg', 'png']
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['REQUESTS_FOLDER'] = REQUESTS_FOLDER
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -43,13 +43,6 @@ def about():
 def get_data():
     return jsonify({'message': 'Дані отримано з сервера!'})
 
-# @app.route('/api/post_data', methods=['POST'])
-# def post_data():
-#     # Отримання даних з POST-запиту
-#     data = request.get_json()
-#     # Обробка даних
-#     message = f"Отримано дані: {data}"
-#     return jsonify({'message': message})
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -72,9 +65,9 @@ def upload_file():
 
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
-        path = os.path.join(app.config['UPLOAD_FOLDER'], request_id) 
+        path = os.path.join(app.config['REQUESTS_FOLDER'], request_id) 
         os.mkdir(path)
-        file.save(os.path.join(path, ORIGIN_FILE_NAME + "." + filename.split(".")[-1]))
+        file.save(os.path.join(path, ORIGINAL_FILE_NAME + "." + filename.split(".")[-1]))
 
         # тут має бути код Миколи
         items = [
@@ -91,4 +84,7 @@ def upload_file():
         
 
 if __name__ == '__main__':
+    if not os.path.exists(REQUESTS_FOLDER):
+        os.makedirs(REQUESTS_FOLDER)
+    
     app.run(debug=True)
