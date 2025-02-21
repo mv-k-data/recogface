@@ -5,8 +5,9 @@ import os
 import uuid
 
 app = Flask(__name__)
+ORIGIN_FILE_NAME = 'origin'  
 UPLOAD_FOLDER = 'uploads'  
-ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'gif']
+ALLOWED_EXTENSIONS = ['gif', 'jpg', 'jpeg', 'png']
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def allowed_file(filename):
@@ -61,30 +62,32 @@ def upload_file():
 
     if 'file' not in request.files:
         response["error"] = "File not found"
-        return jsonify(response), 400
+        return jsonify(response), 200
 
     file = request.files['file']
 
     if file.filename == '':
         response["error"] = "File not found"
-        return jsonify(response), 400
+        return jsonify(response), 200
 
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
-        # ext = filename.
-        # filename = 'origin'
-        # file.save(os.path.join(app.config['UPLOAD_FOLDER'] + "/" + request_id, filename))
-
         path = os.path.join(app.config['UPLOAD_FOLDER'], request_id) 
         os.mkdir(path)
-        file.save(os.path.join(path, filename))
+        file.save(os.path.join(path, ORIGIN_FILE_NAME + "." + filename.split(".")[-1]))
 
         # тут має бути код Миколи
-        
-        return jsonify({'message': 'Файл успішно завантажено'}), 200
+        items = [
+            {"image": "img1.png", "title": "bla bla bla", "url": "https://www.example.com/result1"},
+            {"image": "img2.png", "title": "bla bla bla", "url": "https://www.example.com/result1"},
+            {"image": "img1.png", "title": "bla bla bla", "url": "https://www.example.com/result1"},
+            
+        ]
+        response["content"] = render_template("includes/_list_items_cards.html", items=items)
+        return jsonify(response), 200
     else:
         response["error"] = "Only type file: " + ", ".join(ALLOWED_EXTENSIONS) 
-        return jsonify(response), 400
+        return jsonify(response), 200
         
 
 if __name__ == '__main__':

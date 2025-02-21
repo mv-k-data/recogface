@@ -1,3 +1,9 @@
+const inputId = "#js-input-file"
+const errorBlockId = "#js-error"
+const blockListItems = "#js-list-items"
+const preloderBlock = $('#js-preloader')
+const allowedExtensions = ['jpg', 'jpeg', 'png']
+
 document.querySelectorAll('.js-result-item').forEach(item => {
     item.addEventListener('click', () => {
         const href = item.getAttribute('data-href');
@@ -7,38 +13,35 @@ document.querySelectorAll('.js-result-item').forEach(item => {
     });
 });
 
-const input_id = "#js-input-file"
-const error_block_id = "#js-error"
-const allowedExtensions = ['jpg', 'jpeg', 'png']
-
 function isShowPreloader(el, isShow = false){
-  const preloder_block = $('#js-preloader')
+  
   if (isShow == true) {
-    preloder_block.show()
+    preloderBlock.show()
     el.hide()
   }else{
-    preloder_block.hide()
+    preloderBlock.hide()
     el.show()
   }
 }
 
-$('body').on('change', input_id, function () {
-  $(error_block_id).hide()
-  const parent_block = $(this).closest('div')
+$('body').on('change', inputId, function () {
+  $(errorBlockId).hide()
+  const this_el = $(this)
+  const parentBlock = this_el.closest('div')
   
-  const fileInput = $(this)[0];
+  const fileInput = this_el[0];
   const file = fileInput.files[0];
 
-  isShowPreloader(parent_block, true)
+  isShowPreloader(parentBlock, true)
   if (file) {
     const fileName = file.name;
     const fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
     
     if (allowedExtensions.indexOf(fileExtension) === -1) {
-        isShowPreloader(parent_block, false)
-        $(error_block_id).text("Allowed files: " + allowedExtensions.join(", "))
-        $(error_block_id).show()
-        $(this).val('')
+        isShowPreloader(parentBlock)
+        $(errorBlockId).text("Allowed files: " + allowedExtensions.join(", "))
+        $(errorBlockId).show()
+        this_el.val('')
         return
     }  
 
@@ -52,14 +55,19 @@ $('body').on('change', input_id, function () {
       processData: false, 
       contentType: false, 
       success: function(response) {
-        console.log('OK', response);
-        ///тут обробляти результати
-        isShowPreloader(parent_block, false)
+        if (response.error.length > 0) {
+          $(errorBlockId).text(response.error)
+          $(errorBlockId).show()  
+        }else{
+          $(blockListItems).html(response.content)
+        }
+        isShowPreloader(parentBlock)
+        this_el.val('')
       },
       error: function(error) {
-        // isShowPreloader(parent_block, false)
-        // $(error_block_id).text("Server Error")
-        // $(error_block_id).show()
+        isShowPreloader(parentBlock)
+        $(errorBlockId).text("Server Error")
+        $(errorBlockId).show()
       }
     })
   }  

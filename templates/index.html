@@ -1,4 +1,3 @@
-{% from 'macroses/macros_item_card.html' import render_item %}
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -40,8 +39,10 @@
             <legend class="float-none w-auto px-3">
               <h2>Results</h2>
             </legend>
-            <div class="row row-cols-1 row-cols-md-5 g-4">
-                {{ render_item(items) }}
+            <div class="row row-cols-1 row-cols-md-5 g-4" id="js-list-items">
+              {% with items=items %}
+                  {% include "includes/_list_items_cards.html" %}
+              {% endwith %}
             </div>
           </fieldset>
             
