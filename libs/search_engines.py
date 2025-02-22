@@ -34,6 +34,7 @@ class ImageSearchEngine(ABC):
 
     def __del__(self):
         # destroing driver
+        logger.debug(f"Class for {self.SEARCH_ENGINE} destroyed")
         self.driver.quit()
 
     @abstractmethod
@@ -69,7 +70,7 @@ class GoogleImageSearch(ImageSearchEngine):
         return image_url.attrs["href"]
 
     def _save_image(self, element, result_image_path, result_image_name):
-        logger.debug("Start _save_image")
+        logger.debug(f"Start _save_image ({self.SEARCH_ENGINE})")
         image_full_name = f"{result_image_path}/{result_image_name}"
         if not os.path.exists(result_image_path):
             os.makedirs(result_image_path)
@@ -92,10 +93,10 @@ class GoogleImageSearch(ImageSearchEngine):
                 image = image.encode("utf-8")
                 image_body = image[image.find(b"/9") :]
                 Image.open(BytesIO(base64.b64decode(image_body))).save(image_full_name)
-        logger.debug("Complete _save_image")
+        logger.debug(f"Complete _save_image ({self.SEARCH_ENGINE})")
 
     def search_images(self):
-        logger.debug("Start search_images")
+        logger.debug(f"Start search_images ({self.SEARCH_ENGINE})")
         result_list = []
         cnt = 1
         self._search_interaction()
@@ -116,7 +117,7 @@ class GoogleImageSearch(ImageSearchEngine):
                 cnt += 1
                 result_list.append(result_dict)
         except Exception as e:
-            logger.warning(f"Got error: {e}")
+            logger.warning(f"For {self.SEARCH_ENGINE}  got error: {e}")
 
         return result_list
 
@@ -145,7 +146,7 @@ class BingImageSearch(ImageSearchEngine):
         return json.loads(image_url.attrs["data-m"])["purl"]
 
     def _save_image(self, element, result_image_path, result_image_name):
-        logger.debug("Start _save_image")
+        logger.debug(f"Start _save_image ({self.SEARCH_ENGINE})")
         image_full_name = f"{result_image_path}/{result_image_name}"
         if not os.path.exists(result_image_path):
             os.makedirs(result_image_path)
@@ -157,10 +158,10 @@ class BingImageSearch(ImageSearchEngine):
         with open(image_full_name, "wb") as handler:
             handler.write(img_data)
         
-        logger.debug("Complete _save_image")
+        logger.debug(f"Complete _save_image ({self.SEARCH_ENGINE})")
 
     def search_images(self):
-        logger.debug("Images saved")
+        logger.debug(f"Start search_images ({self.SEARCH_ENGINE})")
         result_list = []
         self._search_interaction()
         image_block = self.soup.find("div", id="i_results")
@@ -182,7 +183,7 @@ class BingImageSearch(ImageSearchEngine):
                 cnt += 1
                 result_list.append(result_dict)
         except Exception as e:
-            logger.warning(f"Got error: {e}")
+            logger.warning(f"For {self.SEARCH_ENGINE}  got error: {e}")
 
         return result_list
 
@@ -220,7 +221,9 @@ class TinEyeImageSearch(ImageSearchEngine):
     SEARCH_ENGINE = "tineye"
 
     def _search_interaction(self):
+        logger.debug(f"Start _search_interaction ({self.SEARCH_ENGINE})")
         self.driver.get("https://tineye.com/")
+        time.sleep(self.WAIT_AFTER_CLICK_SEC)
 
         upload_button= self.driver.find_element(By.ID, "upload-box")
         upload_button.send_keys(os.path.abspath(self.original_image_path))
@@ -229,6 +232,7 @@ class TinEyeImageSearch(ImageSearchEngine):
 
         self.soup = BeautifulSoup(self.driver.page_source, "html.parser")
         self.driver.quit()
+        logger.debug(f"End _search_interaction ({self.SEARCH_ENGINE})")
 
     def _get_image_text(self, element):
         image_url = element.find("a")
@@ -239,7 +243,7 @@ class TinEyeImageSearch(ImageSearchEngine):
         return image_url.attrs["href"]
 
     def _save_image(self, element, result_image_path, result_image_name):
-        logger.debug("Start _save_image")
+        logger.debug(f"Start _save_image ({self.SEARCH_ENGINE})")
         image_full_name = f"{result_image_path}/{result_image_name}"
         if not os.path.exists(result_image_path):
             os.makedirs(result_image_path)
@@ -251,10 +255,10 @@ class TinEyeImageSearch(ImageSearchEngine):
         img_data = requests.get(image).content
         with open(image_full_name, "wb") as handler:
             handler.write(img_data)        
-        logger.debug("Complete _save_image")
+        logger.debug(f"Complete _save_image ({self.SEARCH_ENGINE})")
 
     def search_images(self):
-        logger.debug("Images saved")
+        logger.debug(f"Start search_images ({self.SEARCH_ENGINE})")
         result_list = []
         self._search_interaction()
         block = self.soup.find("div", id="basis-full")
@@ -276,7 +280,7 @@ class TinEyeImageSearch(ImageSearchEngine):
                 cnt += 1
                 result_list.append(result_dict)
         except Exception as e:
-            logger.warning(f"Got error: {e}")
+            logger.warning(f"For {self.SEARCH_ENGINE}  got error: {e}")
 
         return result_list
 
