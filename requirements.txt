@@ -1,3 +1,4 @@
 pillow
 bs4
 requests
+loguru
