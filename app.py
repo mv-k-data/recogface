@@ -23,31 +23,32 @@ def allowed_file(filename):
     )
 
 
-def search_result_and_save(uuid, original_image_path, engine = "google"):
-        result = {"result":[], "error":None}
-        try:
-            search_engine = SearchEngineFactory.get_search_engine(
-                engine, uuid, original_image_path
+def search_result_and_save(uuid, original_image_path, engine="google"):
+    result = {"result": [], "error": None}
+    try:
+        search_engine = SearchEngineFactory.get_search_engine(
+            engine, uuid, original_image_path
+        )
+        result_list = search_engine.search_images()
+    except Exception as e:
+        result["error"] = f"Error: {str(e)}"
+
+    if not result["error"]:
+        search_results = [
+            (
+                i["uuid"],
+                i["search_engine"],
+                i["image_name"],
+                i["image_url"],
+                i["image_text"],
+                i["full_image_name"],
             )
-            result_list = search_engine.search_images()
-        except Exception as e:
-            result["error"] = f"Error: {str(e)}"
-            return jsonify(response), 200
-        if not result["error"]:
-            search_results = [
-                (
-                    i["uuid"],
-                    i["search_engine"],
-                    i["image_name"],
-                    i["image_url"],
-                    i["image_text"],
-                    i["full_image_name"],
-                )
-                for i in result_list
-            ]
-            db.save_search_result(search_results=search_results)
-            result["result"] = search_results
-        return result
+            for i in result_list
+        ]
+        db.save_search_result(search_results=search_results)
+        result["result"] = search_results
+    return result
+
 
 @app.route("/")
 def index():
@@ -113,7 +114,9 @@ def upload_file():
         response["original_image"] = original_image_path
         db.save_original_image(uuid=request_id, image_name=original_image_path)
 
-        result_dict = search_result_and_save(uuid=request_id, original_image_path=original_image_path)
+        result_dict = search_result_and_save(
+            uuid=request_id, original_image_path=original_image_path
+        )
         response["content"] = render_template(
             "includes/_list_items_cards.html", items=result_dict["result"]
         )
