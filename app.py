@@ -24,16 +24,17 @@ def allowed_file(filename):
 
 
 def search_result_and_save(uuid, original_image_path, engine="google"):
-    result = {"result": [], "error": None}
+    is_ok = True
     try:
         search_engine = SearchEngineFactory.get_search_engine(
             engine, uuid, original_image_path
         )
         result_list = search_engine.search_images()
     except Exception as e:
-        result["error"] = f"Error: {str(e)}"
+        is_ok = False
+        raise f"Error: {str(e)}"
 
-    if not result["error"]:
+    if is_ok:
         search_results = [
             (
                 i["uuid"],
@@ -46,9 +47,23 @@ def search_result_and_save(uuid, original_image_path, engine="google"):
             for i in result_list
         ]
         db.save_search_result(search_results=search_results)
-        result["result"] = search_results
-    return result
 
+
+def get_results_from_history(uuid):
+    result = { "error": None}
+    history_details = db.get_history_details()
+    history_details = [
+        {
+            "original_image": i[0],
+            "search_engine": i[1],
+            "image_text": i[2],
+            "image_url": i[3],
+            "full_image_name": i[4],
+        }
+        for i in history_details
+    ]
+    result["result"] = history_details    
+    return result
 
 @app.route("/")
 def index():
@@ -114,9 +129,12 @@ def upload_file():
         response["original_image"] = original_image_path
         db.save_original_image(uuid=request_id, image_name=original_image_path)
 
-        result_dict = search_result_and_save(
+        search_result_and_save(
             uuid=request_id, original_image_path=original_image_path
         )
+        
+        result_dict = get_results_from_history(uuid=request_id)
+        
         response["content"] = render_template(
             "includes/_list_items_cards.html", items=result_dict["result"]
         )

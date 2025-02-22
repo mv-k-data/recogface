@@ -60,6 +60,23 @@ class SqliteDatabaseHelper:
             )
             conn.commit()
 
+    def get_history_details(self):
+        with sqlite3.connect(self.DB_NAME) as conn:
+            cursor = conn.cursor()  
+            cursor.execute("""
+                SELECT 
+                    req.image_name as original_image,  
+                    res.search_engine,
+                    res.image_text,
+                    res.image_url,
+                    res.full_image_name
+                FROM search_request req 
+                LEFT JOIN search_responce res
+                ON req.uuid= res.uuid
+                           
+            """)
+        return cursor.fetchall()      
+
     def get_search_history(self):
         """Отримання всіх збережених результатів."""
         with sqlite3.connect(self.DB_NAME) as conn:
