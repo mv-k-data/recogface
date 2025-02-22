@@ -11,6 +11,7 @@ from io import BytesIO
 from bs4 import BeautifulSoup
 import requests
 import json
+from loguru import logger
 
 
 class ImageSearchEngine(ABC):
@@ -39,7 +40,7 @@ class GoogleImageSearch(ImageSearchEngine):
     SEARCH_ENGINE = "google"
 
     def _search_interaction(self):
-        print("Start _search")
+        logger.debug("Start _search")
         self.driver.get("https://images.google.com/")
         search_button = self.driver.find_element(By.CLASS_NAME, "Gdd5U")
         search_button.click()
@@ -61,11 +62,11 @@ class GoogleImageSearch(ImageSearchEngine):
         return image_url.attrs["href"]
 
     def _save_image(self, element, result_image_path, result_image_name):
-        print("Start _save_image")
+        logger.debug("Start _save_image")
         image_full_name = f"{result_image_path}/{result_image_name}"
         if not os.path.exists(result_image_path):
             os.makedirs(result_image_path)
-        print(
+        logger.debug(
             f"image_full_name: {image_full_name} result_image_path: {result_image_path} "
         )
         # self.driver.save_screenshot(f"{result_image_path}/screenshot_{result_image_name}")
@@ -75,7 +76,7 @@ class GoogleImageSearch(ImageSearchEngine):
             .attrs["src"]
         )
         if image:
-            print("Image present", image[:20])
+            logger.debug(f"Image present: {image[:20]}")
             if image[:5] == "https":
                 img_data = requests.get(image).content
                 with open(image_full_name, "wb") as handler:
@@ -84,15 +85,15 @@ class GoogleImageSearch(ImageSearchEngine):
                 image = image.encode("utf-8")
                 image_body = image[image.find(b"/9") :]
                 Image.open(BytesIO(base64.b64decode(image_body))).save(image_full_name)
-        print("Complete _save_image")
+        logger.debug("Complete _save_image")
 
     def search_images(self):
-        print("Start search_images")
+        logger.debug("Start search_images")
         result_list = []
         cnt = 1
         self._search_interaction()
         all_divs = self.soup.find_all("div", class_="vEWxFf RCxtQc my5z3d")
-        print(f"len(els): {len(all_divs)}")
+        logger.debug(f"len(els): {len(all_divs)}")
         try:
             for e in all_divs:
                 result_dict = {}
@@ -108,7 +109,7 @@ class GoogleImageSearch(ImageSearchEngine):
                 cnt += 1
                 result_list.append(result_dict)
         except Exception as e:
-            print(f"Got error: {e}")
+            logger.debug(f"Got error: {e}")
 
         return result_list
 
@@ -134,14 +135,14 @@ class BingImageSearch(ImageSearchEngine):
 
     def _get_image_url(self, element):
         image_url = element.find("a", class_="richImgLnk")
-        return json.loads(image_url.attrs["data-m"])["murl"]
+        return json.loads(image_url.attrs["data-m"])["purl"]
 
     def _save_image(self, element, result_image_path, result_image_name):
-        print("Start _save_image")
+        logger.debug("Start _save_image")
         image_full_name = f"{result_image_path}/{result_image_name}"
         if not os.path.exists(result_image_path):
             os.makedirs(result_image_path)
-        print(
+        logger.debug(
             f"image_full_name: {image_full_name} result_image_path: {result_image_path} "
         )
         image = element.find("img").attrs["src"]
@@ -149,15 +150,15 @@ class BingImageSearch(ImageSearchEngine):
         with open(image_full_name, "wb") as handler:
             handler.write(img_data)
         
-        print("Complete _save_image")
+        logger.debug("Complete _save_image")
 
     def search_images(self):
-        print("Images saved")
+        logger.debug("Images saved")
         result_list = []
         self._search_interaction()
         image_block = self.soup.find("div", id="i_results")
         blocks = image_block.find_all("div", class_="richImage relImg")
-        print("count:", len(blocks))
+        logger.debug(f"count: {len(blocks)}")
         cnt = 1
         try:
             for e in blocks:
@@ -174,7 +175,7 @@ class BingImageSearch(ImageSearchEngine):
                 cnt += 1
                 result_list.append(result_dict)
         except Exception as e:
-            print(f"Got error: {e}")
+            logger.debug(f"Got error: {e}")
 
         return result_list
 

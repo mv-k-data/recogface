@@ -3,4 +3,4 @@ results
 results/
 __pycache__/
 static/requests/
-
+*.log

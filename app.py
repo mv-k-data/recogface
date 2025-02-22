@@ -7,7 +7,7 @@ import uuid
 from concurrent.futures import ThreadPoolExecutor
 from libs.search_engines import SearchEngineFactory
 from libs.database import SqliteDatabaseHelper
-
+from loguru import logger
 
 app = Flask(__name__)
 ORIGINAL_FILE_NAME = "original"
@@ -96,15 +96,6 @@ def get_data():
     return jsonify({"message": "Дані отримано з сервера!"})
 
 
-# @app.route('/api/post_data', methods=['POST'])
-# def post_data():
-#     # Отримання даних з POST-запиту
-#     data = request.get_json()
-#     # Обробка даних
-#     message = f"Отримано дані: {data}"
-#     return jsonify({'message': message})
-
-
 @app.route("/upload", methods=["POST"])
 def upload_file():
     response = {"error": "", "content": "", "original_image": "static/images/img1.png"}
@@ -131,6 +122,7 @@ def upload_file():
         response["original_image"] = original_image_path
         db.save_original_image(uuid=request_id, image_name=original_image_path)
 
+        app.logger.debug(f"Start iteration")
         # for engine in selected_engines:
         #     search_result_and_save(
         #         uuid=request_id,
@@ -142,6 +134,7 @@ def upload_file():
 
         with ThreadPoolExecutor(max_workers=5) as executor:
             executor.map(perform_search, engines)
+        app.logger.debug(f"End iteration")
 
         result_dict = get_results_from_history(uuid=request_id)
 
