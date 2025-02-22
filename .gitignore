@@ -2,3 +2,4 @@ results
 results/
 __pycache__/
 static/requests/
+search_results.db
