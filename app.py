@@ -18,7 +18,7 @@ app.config["SEARCHES_ENGINES"] = {
     "google": {"is_enabled": True, "is_selected": True, "lable": "Google", "color": "#ff7f50"},
     "bing": {"is_enabled": True, "is_selected": False, "lable": "Bing", "color": "#5a76ef"},
     "yandex": {"is_enabled": False, "is_selected": False, "lable": "Yandex", "color": "#dc7373"},
-    "tineye": {"is_enabled": True, "is_selected": False, "lable": "TinEye", "color": "#00ffff"},
+    "tineye": {"is_enabled": True, "is_selected": False, "lable": "TinEye", "color": "#52bfbf"},
 }
 
 
