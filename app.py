@@ -4,10 +4,10 @@ import os
 import uuid
 
 # import shutil
-# import concurrent.futures
-from search_engines import SearchEngineFactory
-from database import SqliteDatabaseHelper
-
+from concurrent.futures import ThreadPoolExecutor
+from libs.search_engines import SearchEngineFactory
+from libs.database import SqliteDatabaseHelper
+from loguru import logger
 
 app = Flask(__name__)
 ORIGINAL_FILE_NAME = "original"
@@ -42,6 +42,10 @@ def search_result_and_save(uuid, original_image_path, engine="google"):
             for i in result_list
         ]
         db.save_search_result(search_results=search_results)
+
+
+def perform_search(item):
+    search_result_and_save(**item)
 
 
 def get_results_from_history(uuid):
@@ -92,15 +96,6 @@ def get_data():
     return jsonify({"message": "Дані отримано з сервера!"})
 
 
-# @app.route('/api/post_data', methods=['POST'])
-# def post_data():
-#     # Отримання даних з POST-запиту
-#     data = request.get_json()
-#     # Обробка даних
-#     message = f"Отримано дані: {data}"
-#     return jsonify({'message': message})
-
-
 @app.route("/upload", methods=["POST"])
 def upload_file():
     response = {"error": "", "content": "", "original_image": "static/images/img1.png"}
@@ -127,12 +122,19 @@ def upload_file():
         response["original_image"] = original_image_path
         db.save_original_image(uuid=request_id, image_name=original_image_path)
 
-        for engine in selected_engines:
-            search_result_and_save(
-                uuid=request_id,
-                original_image_path=original_image_path,
-                engine=engine
-            )
+        app.logger.debug(f"Start iteration")
+        # for engine in selected_engines:
+        #     search_result_and_save(
+        #         uuid=request_id,
+        #         original_image_path=original_image_path,
+        #         engine=engine
+        #     )
+
+        engines = [{"uuid":request_id, "original_image_path":original_image_path,"engine":e} for e in selected_engines]
+
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            executor.map(perform_search, engines)
+        app.logger.debug(f"End iteration")
 
         result_dict = get_results_from_history(uuid=request_id)
 
