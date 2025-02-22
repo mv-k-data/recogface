@@ -60,10 +60,10 @@ class SqliteDatabaseHelper:
             )
             conn.commit()
 
-    def get_history_details(self):
+    def get_history_details(self, uuid):
         with sqlite3.connect(self.DB_NAME) as conn:
             cursor = conn.cursor()  
-            cursor.execute("""
+            cursor.execute(f"""
                 SELECT 
                     req.image_name as original_image,  
                     res.search_engine,
@@ -73,7 +73,7 @@ class SqliteDatabaseHelper:
                 FROM search_request req 
                 LEFT JOIN search_responce res
                 ON req.uuid= res.uuid
-                           
+                and req.uuid = '{uuid}'           
             """)
         return cursor.fetchall()      
 

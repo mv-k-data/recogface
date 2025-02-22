@@ -131,7 +131,12 @@ class YandexImageSearch(ImageSearchEngine):
 class BingImageSearch(ImageSearchEngine):
     """Клас для пошуку через Bing Images"""
 
-    def search(self, image_path):
+    SEARCH_ENGINE = "google"
+
+    def _search_interaction(self):
+        print("Start _search")
+
+    def search_images(self):
         # self.driver.get("https://www.bing.com/visualsearch")
 
         # upload_button = self.driver.find_element(By.XPATH, "//input[@type='file']")

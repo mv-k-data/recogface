@@ -51,7 +51,7 @@ def search_result_and_save(uuid, original_image_path, engine="google"):
 
 def get_results_from_history(uuid):
     result = { "error": None}
-    history_details = db.get_history_details()
+    history_details = db.get_history_details(uuid=uuid)
     history_details = [
         {
             "original_image": i[0],
