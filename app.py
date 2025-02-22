@@ -5,9 +5,9 @@ import uuid
 
 app = Flask(__name__)
 ORIGINAL_FILE_NAME = "original"
-REQUESTS_FOLDER = "requests"
+RESULTS_FOLDER = "results"
 ALLOWED_EXTENSIONS = ["gif", "jpg", "jpeg", "png"]
-app.config["REQUESTS_FOLDER"] = REQUESTS_FOLDER
+app.config["RESULTS_FOLDER"] = RESULTS_FOLDER
 
 
 def allowed_file(filename):
@@ -95,7 +95,7 @@ def upload_file():
 
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
-        path = os.path.join(app.config["REQUESTS_FOLDER"], request_id)
+        path = os.path.join(app.config["RESULTS_FOLDER"], request_id)
         os.mkdir(path)
         file.save(
             os.path.join(path, ORIGINAL_FILE_NAME + "." + filename.split(".")[-1])
@@ -129,7 +129,7 @@ def upload_file():
 
 
 if __name__ == "__main__":
-    if not os.path.exists(REQUESTS_FOLDER):
-        os.makedirs(REQUESTS_FOLDER)
+    if not os.path.exists(RESULTS_FOLDER):
+        os.makedirs(RESULTS_FOLDER)
 
     app.run(debug=True)
