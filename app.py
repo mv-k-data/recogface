@@ -129,7 +129,7 @@ def upload_file():
         app.logger.debug("End searching")
         result_dict = get_results_from_history(uuid=request_id)
 
-        response["content"] = render_template("includes/_list_items_cards.html", items=result_dict["result"])
+        response["content"] = render_template("includes/_list_items_cards.html.j2", items=result_dict["result"])
         return jsonify(response), 200
     else:
         response["error"] = "Only type file: " + ", ".join(ALLOWED_EXTENSIONS)
