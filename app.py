@@ -17,18 +17,13 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 
 def allowed_file(filename):
-    return (
-        "." in filename 
-        and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
-    )
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 def search_result_and_save(uuid, original_image_path, engine="google"):
     is_ok = True
     try:
-        search_engine = SearchEngineFactory.get_search_engine(
-            engine, uuid, original_image_path
-        )
+        search_engine = SearchEngineFactory.get_search_engine(engine, uuid, original_image_path)
         result_list = search_engine.search_images()
     except Exception as e:
         is_ok = False
@@ -62,12 +57,16 @@ def get_results_from_history(uuid):
         }
         for i in history_details
     ]
-    result["result"] = history_details    
+    result["result"] = history_details
     return result
+
 
 @app.route("/")
 def index():
     items = []
+    # page = request.args.get('history_id', default="")
+    # if page:
+    #     items = xxxxx()
     return render_template("index.html", items=items)
 
 
@@ -122,22 +121,16 @@ def upload_file():
         filename = secure_filename(file.filename)
         path = os.path.join(app.config["UPLOAD_FOLDER"], request_id)
         os.mkdir(path)
-        original_image_path = os.path.join(
-            path, ORIGINAL_FILE_NAME + "." + filename.split(".")[-1]
-        )
+        original_image_path = os.path.join(path, ORIGINAL_FILE_NAME + "." + filename.split(".")[-1])
         file.save(original_image_path)
         response["original_image"] = original_image_path
         db.save_original_image(uuid=request_id, image_name=original_image_path)
 
-        search_result_and_save(
-            uuid=request_id, original_image_path=original_image_path
-        )
-        
+        search_result_and_save(uuid=request_id, original_image_path=original_image_path)
+
         result_dict = get_results_from_history(uuid=request_id)
-        
-        response["content"] = render_template(
-            "includes/_list_items_cards.html", items=result_dict["result"]
-        )
+
+        response["content"] = render_template("includes/_list_items_cards.html", items=result_dict["result"])
         # response["content"] = result_list
         return jsonify(response), 200
     else:
