@@ -42,13 +42,13 @@
                 </form>
               </div>
               <div>
-                <div id="js-original-image" class="js-hide">
+                <div id="js-original-image" class="{{ '' if items|length > 0 else js-hide}}">
                   <fieldset class="border rounded-3 p-3">
                     <legend class="float-none w-auto px-3">
                       <h2>Original image</h2>
                     </legend>
-                    <span class="row row-cols-1 row-cols-md-5 g-4">
-                      <img src="" alt="">
+                    <span class="row row-cols-1 row-cols-md-5 g-4" style="display: block;">
+                      <img src="{{ items[0]['original_image']}}" alt="">
                     </span>
                   </fieldset>
                 </div>

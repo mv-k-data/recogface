@@ -21,7 +21,7 @@
     display:none; /* Прибираємо видимість посилання */
 }
 img{
-    max-width: 232;
+    max-width: 232px;
     max-height: 232px;
 }
 .js-result-item{
@@ -31,9 +31,14 @@ img{
     display: none;
 }
 
-.js-original-image img{
+#js-original-image img{
     min-width: 150px !important;
     max-width: 150px !important;
     min-height: 150px !important;
     max-height: 150px !important;
+}
+
+#js-original-image span{
+    display: block;
+    text-align: center;
 }
