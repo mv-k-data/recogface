@@ -100,9 +100,9 @@ class GoogleImageSearch(ImageSearchEngine):
         result_list = []
         cnt = 1
         self._search_interaction()
-        all_divs = self.soup.find_all("div", class_="vEWxFf RCxtQc my5z3d")
-        logger.debug(f"len(els): {len(all_divs)}")
         try:
+            all_divs = self.soup.find_all("div", class_="vEWxFf RCxtQc my5z3d")
+            logger.debug(f"len(els): {len(all_divs)}")
             for e in all_divs:
                 result_dict = {}
                 result_image_name = f"result_image_{cnt}.jpg"
@@ -117,8 +117,9 @@ class GoogleImageSearch(ImageSearchEngine):
                 cnt += 1
                 result_list.append(result_dict)
         except Exception as e:
-            logger.warning(f"For {self.SEARCH_ENGINE}  got error: {e}")
+            logger.warning(f"Error in search_images ({self.SEARCH_ENGINE}):  {e}")
 
+        logger.debug(f"End search_images ({self.SEARCH_ENGINE})")
         return result_list
 
 class BingImageSearch(ImageSearchEngine):
@@ -164,11 +165,11 @@ class BingImageSearch(ImageSearchEngine):
         logger.debug(f"Start search_images ({self.SEARCH_ENGINE})")
         result_list = []
         self._search_interaction()
-        image_block = self.soup.find("div", id="i_results")
-        blocks = image_block.find_all("div", class_="richImage relImg")
-        logger.debug(f"count: {len(blocks)}")
-        cnt = 1
-        try:
+        try: 
+            image_block = self.soup.find("div", id="i_results")
+            blocks = image_block.find_all("div", class_="richImage relImg")
+            logger.debug(f"count: {len(blocks)}")
+            cnt = 1
             for e in blocks:
                 result_dict = {}
                 result_image_name = f"result_image_{cnt}.jpg"
@@ -183,8 +184,9 @@ class BingImageSearch(ImageSearchEngine):
                 cnt += 1
                 result_list.append(result_dict)
         except Exception as e:
-            logger.warning(f"For {self.SEARCH_ENGINE}  got error: {e}")
+            logger.warning(f"Error in search_images ({self.SEARCH_ENGINE}):  {e}")
 
+        logger.debug(f"End search_images ({self.SEARCH_ENGINE})")
         return result_list
 
 class YandexImageSearch(ImageSearchEngine):
@@ -224,11 +226,15 @@ class TinEyeImageSearch(ImageSearchEngine):
         logger.debug(f"Start _search_interaction ({self.SEARCH_ENGINE})")
         self.driver.get("https://tineye.com/")
         time.sleep(self.WAIT_AFTER_CLICK_SEC)
+        # self.driver.save_screenshot(f'{self.SEARCH_ENGINE}_1.png')
 
         upload_button= self.driver.find_element(By.ID, "upload-box")
         upload_button.send_keys(os.path.abspath(self.original_image_path))
 
         time.sleep(self.WAIT_AFTER_LOAD_SEC)
+        # self.driver.save_screenshot(f'{self.SEARCH_ENGINE}_2.png')
+        # with open(f"content_{self.SEARCH_ENGINE}.html","w") as f:
+        #     f.writelines(self.driver.page_source)
 
         self.soup = BeautifulSoup(self.driver.page_source, "html.parser")
         self.driver.quit()
@@ -251,7 +257,7 @@ class TinEyeImageSearch(ImageSearchEngine):
             f"image_full_name: {image_full_name} result_image_path: {result_image_path} "
         )        
         image = element.find("img").attrs["src"]
-        image = image.replace("?size=160", "size=640")
+        # image = image.replace("?size=160", "size=640")
         img_data = requests.get(image).content
         with open(image_full_name, "wb") as handler:
             handler.write(img_data)        
@@ -261,11 +267,11 @@ class TinEyeImageSearch(ImageSearchEngine):
         logger.debug(f"Start search_images ({self.SEARCH_ENGINE})")
         result_list = []
         self._search_interaction()
-        block = self.soup.find("div", id="basis-full")
-        blocks = block.select("div[class*='flex items-start gap-8']")
-        logger.debug(f"count: {len(blocks)}")
-        cnt = 1
         try:
+            block = self.soup.find("div", class_="basis-full")
+            blocks = block.select("div[class*='flex items-start gap-8']")
+            logger.debug(f"count: {len(blocks)}")
+            cnt = 1
             for e in blocks:
                 result_dict = {}
                 result_image_name = f"result_image_{cnt}.jpg"
@@ -280,8 +286,9 @@ class TinEyeImageSearch(ImageSearchEngine):
                 cnt += 1
                 result_list.append(result_dict)
         except Exception as e:
-            logger.warning(f"For {self.SEARCH_ENGINE}  got error: {e}")
+            logger.warning(f"Error in search_images ({self.SEARCH_ENGINE}):  {e}")
 
+        logger.debug(f"End search_images ({self.SEARCH_ENGINE})")
         return result_list
 
 
