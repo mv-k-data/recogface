@@ -12,7 +12,14 @@ app = Flask(__name__)
 ORIGINAL_FILE_NAME = "original"
 UPLOAD_FOLDER = "static/requests"
 ALLOWED_EXTENSIONS = ["gif", "jpg", "jpeg", "png"]
+app.config["ALLOWED_EXTENSIONS"] = ALLOWED_EXTENSIONS
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.config["SEARCHES_ENGINES"] = {
+    "google": {"is_enable": True, "lable": "Google"},
+    "bing": {"is_enable": True, "lable": "Bing"},
+    "yandex": {"is_enable": False, "lable": "Yandex"},
+    "tineye": {"is_enable": False, "lable": "TinEye"},
+}
 
 
 def allowed_file(filename):
@@ -48,7 +55,7 @@ def perform_search(item):
 
 
 def get_results_from_history(uuid):
-    result = { "error": None}
+    result = {"error": None}
     history_details = db.get_history_details(uuid=uuid)
     history_details = [
         {
@@ -66,15 +73,13 @@ def get_results_from_history(uuid):
 
 @app.route("/")
 def index():
-    # return jsonify(get_results_from_history(uuid=request.args.get('history_id', default=""))["result"])
     return render_template(
-        "index.html", 
-        items=get_results_from_history(uuid=request.args.get('history_id', default=""))["result"]
+        "index.html.j2", items=get_results_from_history(uuid=request.args.get("history_id", default=""))["result"]
     )
 
 
 @app.route("/history")
-def about():
+def history():
     history = db.get_search_history()
     history = [
         {
@@ -86,13 +91,7 @@ def about():
         }
         for i in history
     ]
-    # return jsonify(history)
-    return render_template("history.html", items=history)
-
-
-@app.route("/api/data")
-def get_data():
-    return jsonify({"message": "Дані отримано з сервера!"})
+    return render_template("history.html.j2", items=history)
 
 
 @app.route("/upload", methods=["POST"])
@@ -121,11 +120,13 @@ def upload_file():
         response["original_image"] = original_image_path
         db.save_original_image(uuid=request_id, image_name=original_image_path)
 
-        app.logger.debug(f"Start searching...")
-        engines = [{"uuid":request_id, "original_image_path":original_image_path,"engine":e} for e in selected_engines]
+        app.logger.debug("Start searching...")
+        engines = [
+            {"uuid": request_id, "original_image_path": original_image_path, "engine": e} for e in selected_engines
+        ]
         with ThreadPoolExecutor(max_workers=5) as executor:
             executor.map(perform_search, engines)
-        app.logger.debug(f"End searching")
+        app.logger.debug("End searching")
         result_dict = get_results_from_history(uuid=request_id)
 
         response["content"] = render_template("includes/_list_items_cards.html", items=result_dict["result"])

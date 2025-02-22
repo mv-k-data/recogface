@@ -1,0 +1,14 @@
+{% for engine, details in config.SEARCHES_ENGINES.items() %}
+    <div class="form-check form-switch">
+        <input class="form-check-input" 
+            type="checkbox" 
+            id="inp_{{engine}}" 
+            value="{{engine}}" 
+            name="search_engine" 
+            {{ 'checked ' if details.is_enable else 'disabled'  }} 
+        >
+        <label class="form-check-label" for="inp_{{engine}}">
+            {{details.lable}}
+        </label>
+    </div>
+{% endfor %}
