@@ -17,13 +17,20 @@ from loguru import logger
 class ImageSearchEngine(ABC):
     """Abstract class for image search"""
 
+    WAIT_AFTER_CLICK_SEC = 2
+    WAIT_AFTER_LOAD_SEC = 4
+    SEARCH_ENGINE = ""
+
     def __init__(self, uuid, original_image_path):
         chrome_options = Options()
-        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+        chrome_options.add_argument("--headless=new")         
         self.driver = webdriver.Chrome(options=chrome_options)
+        self.driver.set_window_size(1920, 1080)
         self.original_image_path = original_image_path
         self.result_image_path = original_image_path[: original_image_path.rfind("/")]
         self.uuid = uuid
+        logger.debug(f"Class for {self.SEARCH_ENGINE} initialized")
 
     def __del__(self):
         # destroing driver
@@ -44,12 +51,12 @@ class GoogleImageSearch(ImageSearchEngine):
         self.driver.get("https://images.google.com/")
         search_button = self.driver.find_element(By.CLASS_NAME, "Gdd5U")
         search_button.click()
-        time.sleep(3)
+        time.sleep(self.WAIT_AFTER_CLICK_SEC)
 
         upload_input = self.driver.find_element(By.NAME, "encoded_image")
         upload_input.send_keys(os.path.abspath(self.original_image_path))
 
-        time.sleep(5)
+        time.sleep(self.WAIT_AFTER_LOAD_SEC)
         self.soup = BeautifulSoup(self.driver.page_source, "html.parser")
         self.driver.quit()
 
@@ -109,7 +116,7 @@ class GoogleImageSearch(ImageSearchEngine):
                 cnt += 1
                 result_list.append(result_dict)
         except Exception as e:
-            logger.debug(f"Got error: {e}")
+            logger.warning(f"Got error: {e}")
 
         return result_list
 
@@ -124,7 +131,7 @@ class BingImageSearch(ImageSearchEngine):
         upload_button = self.driver.find_element(By.XPATH, "//input[@type='file']")
         upload_button.send_keys(os.path.abspath(self.original_image_path))
 
-        time.sleep(5)
+        time.sleep(self.WAIT_AFTER_LOAD_SEC)
 
         self.soup = BeautifulSoup(self.driver.page_source, "html.parser")
         self.driver.quit()
@@ -175,7 +182,7 @@ class BingImageSearch(ImageSearchEngine):
                 cnt += 1
                 result_list.append(result_dict)
         except Exception as e:
-            logger.debug(f"Got error: {e}")
+            logger.warning(f"Got error: {e}")
 
         return result_list
 
@@ -190,7 +197,7 @@ class YandexImageSearch(ImageSearchEngine):
         upload_button = self.driver.find_element(By.XPATH, "//input[@type='file']")
         upload_button.send_keys(os.path.abspath(self.original_image_path))
 
-        time.sleep(5)
+        time.sleep(self.WAIT_AFTER_LOAD_SEC)
 
         self.soup = BeautifulSoup(self.driver.page_source, "html.parser")
         self.driver.quit()
@@ -215,25 +222,63 @@ class TinEyeImageSearch(ImageSearchEngine):
     def _search_interaction(self):
         self.driver.get("https://tineye.com/")
 
-        upload_button = self.driver.find_element(By.XPATH, "//input[@type='file']")
+        upload_button= self.driver.find_element(By.ID, "upload-box")
         upload_button.send_keys(os.path.abspath(self.original_image_path))
 
-        time.sleep(5)
+        time.sleep(self.WAIT_AFTER_LOAD_SEC)
 
         self.soup = BeautifulSoup(self.driver.page_source, "html.parser")
         self.driver.quit()
 
     def _get_image_text(self, element):
-        ...
-
+        image_url = element.find("a")
+        return image_url.text
+    
     def _get_image_url(self, element):
-        ...
+        image_url = element.find("a")
+        return image_url.attrs["href"]
 
     def _save_image(self, element, result_image_path, result_image_name):
-        ...
+        logger.debug("Start _save_image")
+        image_full_name = f"{result_image_path}/{result_image_name}"
+        if not os.path.exists(result_image_path):
+            os.makedirs(result_image_path)
+        logger.debug(
+            f"image_full_name: {image_full_name} result_image_path: {result_image_path} "
+        )        
+        image = element.find("img").attrs["src"]
+        image = image.replace("?size=160", "size=640")
+        img_data = requests.get(image).content
+        with open(image_full_name, "wb") as handler:
+            handler.write(img_data)        
+        logger.debug("Complete _save_image")
 
     def search_images(self):
-        ...
+        logger.debug("Images saved")
+        result_list = []
+        self._search_interaction()
+        block = self.soup.find("div", id="basis-full")
+        blocks = block.select("div[class*='flex items-start gap-8']")
+        logger.debug(f"count: {len(blocks)}")
+        cnt = 1
+        try:
+            for e in blocks:
+                result_dict = {}
+                result_image_name = f"result_image_{cnt}.jpg"
+                result_image_path = f"{self.result_image_path}/{self.SEARCH_ENGINE}"
+                result_dict["uuid"] = self.uuid
+                result_dict["search_engine"] = self.SEARCH_ENGINE
+                result_dict["image_name"] = result_image_name
+                result_dict["image_url"] = self._get_image_url(e)
+                result_dict["image_text"] = self._get_image_text(e)
+                result_dict["full_image_name"] = f"{result_image_path}/{result_image_name}"
+                self._save_image(e, result_image_path, result_image_name)
+                cnt += 1
+                result_list.append(result_dict)
+        except Exception as e:
+            logger.warning(f"Got error: {e}")
+
+        return result_list
 
 
 class SearchEngineFactory:
