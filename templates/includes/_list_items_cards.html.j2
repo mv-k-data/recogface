@@ -4,7 +4,11 @@
             <img src="{{ item.full_image_name }}" class="rounded mx-auto d-block" alt="..."> 
             <div class="card-body">
             <p class="card-text">{{ item.image_text }}</p>
-            <span class="badge bg-secondary">{{item.search_engine}}</span>
+            <span class="badge bg-secondary"
+                style="background: {{ config.SEARCHES_ENGINES.get(item.search_engine, '').get('color', 'silver')}} !important;"
+            >
+                {{item.search_engine}}
+            </span>
             </div>
         </div>
     </div>
