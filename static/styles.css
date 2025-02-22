@@ -27,3 +27,13 @@ img{
 .js-result-item{
   cursor: pointer;
 }
+.js-hide{
+    display: none;
+}
+
+.js-hide img{
+    min-width: 150px !important;
+    max-width: 150px !important;
+    min-height: 150px !important;
+    max-height: 150px !important;
+}

@@ -1,10 +1,10 @@
 {% for item in items %}
     <div class="col" >
-        <div class="card h-100 js-result-item" data-href="{{ item.url }}">
-            <img src="{{ url_for('static', filename='images/' + item.image) }}" class="rounded mx-auto d-block" alt="...">
+        <div class="card h-100 js-result-item" data-href="{{ item.image_url }}">
+            <img src="{{ item.full_image_name }}" class="rounded mx-auto d-block" alt="..."> 
             <div class="card-body">
-            <p class="card-text">{{ item.title }}</p>
-            <span class="btn btn-link text-wrap text-break">{{ item.url }}</span>
+            <p class="card-text">{{ item.image_text }}</p>
+            <a href="{{item.image_url}}" class="btn btn-primary" target="_blank">Site</a>
             </div>
         </div>
     </div>

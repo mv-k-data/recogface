@@ -1,6 +1,7 @@
 const inputId = "#js-input-file"
 const errorBlockId = "#js-error"
 const blockListItems = "#js-list-items"
+const blockOriginalImage = "#js-original-image"
 const preloderBlock = $('#js-preloader')
 const allowedExtensions = ['jpg', 'jpeg', 'png']
 
@@ -63,6 +64,8 @@ $('body').on('change', inputId, function () {
         }
         isShowPreloader(parentBlock)
         this_el.val('')
+        $(blockOriginalImage).find('img').attr("src", response.original_image);
+        $(blockOriginalImage).removeClass('js-hide')
       },
       error: function(error) {
         isShowPreloader(parentBlock)

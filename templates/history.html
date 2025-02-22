@@ -28,20 +28,22 @@
                     <th scope="col">Date</th>
                     <th scope="col">Image by find</th>
                     <th scope="col">Count Image</th>
+                    <th scope="col">Search Engines</th>
                     <th scope="col">Show result</th>
                     
                   </tr>
                 </thead>
                 <tbody>
-                    {% for item in l %}
+                    {% for item in items %}
                         <tr>
                             <th scope="row">{{ loop.index}}</th>
-                            <td>{{item.date}}</td>
+                            <td>{{item.created_at}}</td>
                             <td style="text-align: left;">
-                                <img src="{{ url_for('static', filename='images/' + item.image) }}" alt="">
+                                <img src="{{ item.image_name }}" alt="">
                             </td>
                             <td>{{item.count}}</td>
-                            <td><a href="/?history_id_{{loop.index}}" class="btn btn-link">show</a></td>
+                            <td>{{item.search_engines}}</td>
+                            <td><a href="/?history_id_{{item.uuid}}" class="btn btn-link">show</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>
