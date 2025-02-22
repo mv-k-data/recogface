@@ -5,14 +5,9 @@ const blockOriginalImage = "#js-original-image"
 const preloderBlock = $('#js-preloader')
 const allowedExtensions = ['jpg', 'jpeg', 'png']
 
-document.querySelectorAll('.js-result-item').forEach(item => {
-    item.addEventListener('click', () => {
-        const href = item.getAttribute('data-href');
-        if (href) {
-            window.open(href, '_blank');
-        }
-    });
-});
+$('body').on('click', '.js-result-item', function(){
+  window.open($(this).data('href'), '_blank');
+})
 
 function isShowPreloader(el, isShow = false){
   
