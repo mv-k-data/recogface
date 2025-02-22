@@ -5,7 +5,7 @@
             id="inp_{{engine}}" 
             value="{{engine}}" 
             name="search_engine" 
-            {{ 'checked ' if details.is_enable else 'disabled'  }} 
+            {{ 'disabled' if not details.is_enabled else 'checked' if details.is_selected else ''  }} 
         >
         <label class="form-check-label" for="inp_{{engine}}">
             {{details.lable}}
