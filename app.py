@@ -4,7 +4,7 @@ import os
 import uuid
 
 # import shutil
-# import concurrent.futures
+from concurrent.futures import ThreadPoolExecutor
 from libs.search_engines import SearchEngineFactory
 from libs.database import SqliteDatabaseHelper
 
@@ -42,6 +42,10 @@ def search_result_and_save(uuid, original_image_path, engine="google"):
             for i in result_list
         ]
         db.save_search_result(search_results=search_results)
+
+
+def perform_search(item):
+    search_result_and_save(**item)
 
 
 def get_results_from_history(uuid):
@@ -127,12 +131,17 @@ def upload_file():
         response["original_image"] = original_image_path
         db.save_original_image(uuid=request_id, image_name=original_image_path)
 
-        for engine in selected_engines:
-            search_result_and_save(
-                uuid=request_id,
-                original_image_path=original_image_path,
-                engine=engine
-            )
+        # for engine in selected_engines:
+        #     search_result_and_save(
+        #         uuid=request_id,
+        #         original_image_path=original_image_path,
+        #         engine=engine
+        #     )
+
+        engines = [{"uuid":request_id, "original_image_path":original_image_path,"engine":e} for e in selected_engines]
+
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            executor.map(perform_search, engines)
 
         result_dict = get_results_from_history(uuid=request_id)
 
