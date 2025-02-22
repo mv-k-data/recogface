@@ -63,6 +63,7 @@ def get_results_from_history(uuid):
 
 @app.route("/")
 def index():
+    # return jsonify(get_results_from_history(uuid=request.args.get('history_id', default=""))["result"])
     return render_template(
         "index.html", 
         items=get_results_from_history(uuid=request.args.get('history_id', default=""))["result"]
