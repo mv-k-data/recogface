@@ -13,29 +13,30 @@
         <section id="upload-section" class="mb-5">
           <div class="d-flex justify-content-between">
               <div>
-                <h2>Download file</h2>
+                <h2>Face recognition</h2>
                 <form id="js-form-upload" >
                     <div id="js-preloader" style="display: none;">
                       <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
-                        <span class="visually-hidden">Загрузка...</span>
+                        <span class="visually-hidden">Downloads...</span>
                       </div>
                     </div>
-                    <div class="mb-3">
-                        <input class="form-control" id="js-input-file" type="file" id="fileInput">
-                    </div>
-                    <div id="js-error" style="display: none;" class="alert alert-danger" role="alert">
-                    </div>
+                    
                     <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" id="google" name="google">
+                      <input class="form-check-input" type="checkbox" id="google" value="google" name="search_engine" checked >
                       <label class="form-check-label" for="google">Google</label>
                     </div>
                     <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" id="google" name="bind" disabled>
-                      <label class="form-check-label" for="bind">Bind</label>
+                      <input class="form-check-input" type="checkbox" id="bing" value="bing" name="search_engine">
+                      <label class="form-check-label" for="bing">Bing</label>
                     </div>
-                    <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" id="google" name="yandex" disabled>
-                      <label class="form-check-label" for="google">Ynadex</label>
+                    <div class="form-check form-switch mb-4">
+                      <input class="form-check-input" type="checkbox" id="yandex" value="yandex" name="search_engine" disabled>
+                      <label class="form-check-label" for="yandex">Ynadex</label>
+                    </div>
+                    <div class="mb-3">
+                      <input class="form-control" id="js-input-file" type="file" id="fileInput">
+                    </div>
+                    <div id="js-error" style="display: none;" class="alert alert-danger" role="alert">
                     </div>
                     <!-- <button type="submit" >Завантажити</button> -->
                 </form>

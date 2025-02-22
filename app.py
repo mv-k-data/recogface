@@ -103,9 +103,7 @@ def get_data():
 @app.route("/upload", methods=["POST"])
 def upload_file():
     response = {"error": "", "content": "", "original_image": "static/images/img1.png"}
-    # data = request.json
-    # return jsonify(request.form)
-    
+    selected_engines = request.form.get("selected_engines", "").split(",")
 
     request_id = str(uuid.uuid4())
 
@@ -128,7 +126,12 @@ def upload_file():
         response["original_image"] = original_image_path
         db.save_original_image(uuid=request_id, image_name=original_image_path)
 
-        search_result_and_save(uuid=request_id, original_image_path=original_image_path)
+        for engine in selected_engines:
+            search_result_and_save(
+                uuid=request_id,
+                original_image_path=original_image_path,
+                engine=engine
+            )
 
         result_dict = get_results_from_history(uuid=request_id)
 

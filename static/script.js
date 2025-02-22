@@ -46,8 +46,20 @@ $('body').on('change', inputId, function () {
         return
     }  
 
+    const selectedEngines = $('input[name="search_engine"]:checked').map(function() {
+      return $(this).val();
+    }).get();
+    
+    if (selectedEngines.length < 1){
+      isShowPreloader(parentBlock)
+        $(errorBlockId).text("Choose at least one")
+        $(errorBlockId).show()
+        return 
+    } 
+    
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('selected_engines', selectedEngines);
 
     $.ajax({
       url: '/upload', 
