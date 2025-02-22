@@ -15,10 +15,10 @@ ALLOWED_EXTENSIONS = ["gif", "jpg", "jpeg", "png"]
 app.config["ALLOWED_EXTENSIONS"] = ALLOWED_EXTENSIONS
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["SEARCHES_ENGINES"] = {
-    "google": {"is_enable": True, "lable": "Google"},
-    "bing": {"is_enable": True, "lable": "Bing"},
-    "yandex": {"is_enable": False, "lable": "Yandex"},
-    "tineye": {"is_enable": False, "lable": "TinEye"},
+    "google": {"is_enabled": True, "is_selected": True, "lable": "Google"},
+    "bing": {"is_enabled": True, "is_selected": False, "lable": "Bing"},
+    "yandex": {"is_enabled": False, "is_selected": False, "lable": "Yandex"},
+    "tineye": {"is_enabled": True, "is_selected": False, "lable": "TinEye"},
 }
 
 
@@ -129,7 +129,7 @@ def upload_file():
         app.logger.debug("End searching")
         result_dict = get_results_from_history(uuid=request_id)
 
-        response["content"] = render_template("includes/_list_items_cards.html", items=result_dict["result"])
+        response["content"] = render_template("includes/_list_items_cards.html.j2", items=result_dict["result"])
         return jsonify(response), 200
     else:
         response["error"] = "Only type file: " + ", ".join(ALLOWED_EXTENSIONS)
