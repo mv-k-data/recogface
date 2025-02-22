@@ -63,11 +63,10 @@ def get_results_from_history(uuid):
 
 @app.route("/")
 def index():
-    items = []
-    # page = request.args.get('history_id', default="")
-    # if page:
-    #     items = xxxxx()
-    return render_template("index.html", items=items)
+    return render_template(
+        "index.html", 
+        items=get_results_from_history(uuid=request.args.get('history_id', default=""))["result"]
+    )
 
 
 @app.route("/history")
@@ -104,6 +103,9 @@ def get_data():
 @app.route("/upload", methods=["POST"])
 def upload_file():
     response = {"error": "", "content": "", "original_image": "static/images/img1.png"}
+    # data = request.json
+    # return jsonify(request.form)
+    
 
     request_id = str(uuid.uuid4())
 

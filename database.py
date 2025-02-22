@@ -73,7 +73,7 @@ class SqliteDatabaseHelper:
                 FROM search_request req 
                 LEFT JOIN search_responce res
                 ON req.uuid= res.uuid
-                and req.uuid = '{uuid}'           
+                WHERE req.uuid = '{uuid}'           
             """)
         return cursor.fetchall()      
 
