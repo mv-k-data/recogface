@@ -42,3 +42,20 @@ img{
     display: block;
     text-align: center;
 }
+
+.card .read-more:hover{
+    font-size: 14px;
+}
+
+.card:hover{
+    box-shadow: 8px 8px 8px rgb(170, 191, 241);
+    transform:scale(1.05);
+}
+
+.card{
+  /* height:200px;
+  width:200px; */
+  border:1px solid black;
+  transition:.3s;
+  /* margin: 3rem; */
+}
