@@ -84,6 +84,7 @@ class GoogleImageSearch(ImageSearchEngine):
                 image = image.encode("utf-8")
                 image_body = image[image.find(b"/9") :]
                 Image.open(BytesIO(base64.b64decode(image_body))).save(image_full_name)
+        print("Complete _save_image")
 
     def search_images(self):
         print("Start search_images")
@@ -92,19 +93,22 @@ class GoogleImageSearch(ImageSearchEngine):
         self._search_interaction()
         all_divs = self.soup.find_all("div", class_="vEWxFf RCxtQc my5z3d")
         print(f"len(els): {len(all_divs)}")
-        for e in all_divs:
-            result_dict = {}
-            result_image_name = f"result_image_{cnt}.jpg"
-            result_image_path = f"{self.result_image_path}/{self.SEARCH_ENGINE}"
-            result_dict["uuid"] = self.uuid
-            result_dict["search_engine"] = self.SEARCH_ENGINE
-            result_dict["image_name"] = result_image_name
-            result_dict["image_url"] = self._get_image_url(e)
-            result_dict["image_text"] = self._get_image_text(e)
-            result_dict["full_image_name"] = f"{result_image_path}/{result_image_name}"
-            self._save_image(e, result_image_path, result_image_name)
-            cnt += 1
-            result_list.append(result_dict)
+        try:
+            for e in all_divs:
+                result_dict = {}
+                result_image_name = f"result_image_{cnt}.jpg"
+                result_image_path = f"{self.result_image_path}/{self.SEARCH_ENGINE}"
+                result_dict["uuid"] = self.uuid
+                result_dict["search_engine"] = self.SEARCH_ENGINE
+                result_dict["image_name"] = result_image_name
+                result_dict["image_url"] = self._get_image_url(e)
+                result_dict["image_text"] = self._get_image_text(e)
+                result_dict["full_image_name"] = f"{result_image_path}/{result_image_name}"
+                self._save_image(e, result_image_path, result_image_name)
+                cnt += 1
+                result_list.append(result_dict)
+        except Exception as e:
+            print(f"Got error: {e}")
 
         return result_list
 
@@ -144,6 +148,8 @@ class BingImageSearch(ImageSearchEngine):
         img_data = requests.get(image).content
         with open(image_full_name, "wb") as handler:
             handler.write(img_data)
+        
+        print("Complete _save_image")
 
     def search_images(self):
         print("Images saved")
@@ -153,19 +159,22 @@ class BingImageSearch(ImageSearchEngine):
         blocks = image_block.find_all("div", class_="richImage relImg")
         print("count:", len(blocks))
         cnt = 1
-        for e in blocks:
-            result_dict = {}
-            result_image_name = f"result_image_{cnt}.jpg"
-            result_image_path = f"{self.result_image_path}/{self.SEARCH_ENGINE}"
-            result_dict["uuid"] = self.uuid
-            result_dict["search_engine"] = self.SEARCH_ENGINE
-            result_dict["image_name"] = result_image_name
-            result_dict["image_url"] = self._get_image_url(e)
-            result_dict["image_text"] = self._get_image_text(e)
-            result_dict["full_image_name"] = f"{result_image_path}/{result_image_name}"
-            self._save_image(e, result_image_path, result_image_name)
-            cnt += 1
-            result_list.append(result_dict)
+        try:
+            for e in blocks:
+                result_dict = {}
+                result_image_name = f"result_image_{cnt}.jpg"
+                result_image_path = f"{self.result_image_path}/{self.SEARCH_ENGINE}"
+                result_dict["uuid"] = self.uuid
+                result_dict["search_engine"] = self.SEARCH_ENGINE
+                result_dict["image_name"] = result_image_name
+                result_dict["image_url"] = self._get_image_url(e)
+                result_dict["image_text"] = self._get_image_text(e)
+                result_dict["full_image_name"] = f"{result_image_path}/{result_image_name}"
+                self._save_image(e, result_image_path, result_image_name)
+                cnt += 1
+                result_list.append(result_dict)
+        except Exception as e:
+            print(f"Got error: {e}")
 
         return result_list
 

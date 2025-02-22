@@ -5,8 +5,8 @@ import uuid
 
 # import shutil
 # import concurrent.futures
-from search_engines import SearchEngineFactory
-from database import SqliteDatabaseHelper
+from libs.search_engines import SearchEngineFactory
+from libs.database import SqliteDatabaseHelper
 
 
 app = Flask(__name__)
