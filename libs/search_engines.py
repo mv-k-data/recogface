@@ -15,7 +15,7 @@ from loguru import logger
 
 
 class ImageSearchEngine(ABC):
-    """Абстрактний клас для пошукових систем зображень."""
+    """Abstract class for image search"""
 
     def __init__(self, uuid, original_image_path):
         chrome_options = Options()
@@ -114,7 +114,7 @@ class GoogleImageSearch(ImageSearchEngine):
         return result_list
 
 class BingImageSearch(ImageSearchEngine):
-    """Клас для пошуку через Bing Images"""
+    """Class for search via Bing Images"""
 
     SEARCH_ENGINE = "bing"
 
@@ -180,7 +180,7 @@ class BingImageSearch(ImageSearchEngine):
         return result_list
 
 class YandexImageSearch(ImageSearchEngine):
-    """Клас для пошуку через Yandex Images"""
+    """Class for search via Yandex Images"""
 
     SEARCH_ENGINE = "yandex"
 
@@ -208,7 +208,7 @@ class YandexImageSearch(ImageSearchEngine):
         ...
 
 class TinEyeImageSearch(ImageSearchEngine):
-    """Клас для пошуку через TinEye"""
+    """Class for search via TinEye"""
 
     SEARCH_ENGINE = "tineye"
 

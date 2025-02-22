@@ -1,6 +1,4 @@
 import sqlite3
-from loguru import logger
-
 
 class SqliteDatabaseHelper:
     DB_NAME = "search_results.db"

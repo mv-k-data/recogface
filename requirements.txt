@@ -1,4 +1,7 @@
+flask
+flask-wtf 
+selenium 
 pillow
-bs4
+beautifulsoup4
 requests
 loguru

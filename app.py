@@ -1,9 +1,8 @@
-from flask import Flask, request, render_template, jsonify  # type: ignore
+from flask import Flask, request, render_template, jsonify
 from werkzeug.utils import secure_filename
 import os
 import uuid
 
-# import shutil
 from concurrent.futures import ThreadPoolExecutor
 from libs.search_engines import SearchEngineFactory
 from libs.database import SqliteDatabaseHelper
@@ -122,24 +121,14 @@ def upload_file():
         response["original_image"] = original_image_path
         db.save_original_image(uuid=request_id, image_name=original_image_path)
 
-        app.logger.debug(f"Start iteration")
-        # for engine in selected_engines:
-        #     search_result_and_save(
-        #         uuid=request_id,
-        #         original_image_path=original_image_path,
-        #         engine=engine
-        #     )
-
+        app.logger.debug(f"Start searching...")
         engines = [{"uuid":request_id, "original_image_path":original_image_path,"engine":e} for e in selected_engines]
-
         with ThreadPoolExecutor(max_workers=5) as executor:
             executor.map(perform_search, engines)
-        app.logger.debug(f"End iteration")
-
+        app.logger.debug(f"End searching")
         result_dict = get_results_from_history(uuid=request_id)
 
         response["content"] = render_template("includes/_list_items_cards.html", items=result_dict["result"])
-        # response["content"] = result_list
         return jsonify(response), 200
     else:
         response["error"] = "Only type file: " + ", ".join(ALLOWED_EXTENSIONS)
