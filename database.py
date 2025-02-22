@@ -1,6 +1,7 @@
 import sqlite3
 
-class SqliteDatabaseHelper():
+
+class SqliteDatabaseHelper:
     DB_NAME = "search_results.db"
 
     def __init__(self):
@@ -10,16 +11,16 @@ class SqliteDatabaseHelper():
         """Ініціалізація бази даних (створення таблиці, якщо її немає)."""
         with sqlite3.connect(self.DB_NAME) as conn:
             cursor = conn.cursor()
-            cursor.execute('''
+            cursor.execute("""
                 CREATE TABLE IF NOT EXISTS search_request (
                     uuid TEXT PRIMARY KEY,
                     image_name TEXT,
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
                 )
-            ''')
+            """)
             conn.commit()
 
-            cursor.execute('''
+            cursor.execute("""
                 CREATE TABLE IF NOT EXISTS search_responce (
                     uuid TEXT,
                     search_engine TEXT,
@@ -30,35 +31,40 @@ class SqliteDatabaseHelper():
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     UNIQUE(uuid, search_engine, image_name)
                 )
-            ''')
+            """)
             conn.commit()
-
 
     def save_original_image(self, uuid, image_name):
         """Збереження результату пошуку в базу даних."""
         with sqlite3.connect(self.DB_NAME) as conn:
             cursor = conn.cursor()
-            cursor.execute('''
+            cursor.execute(
+                """
                 INSERT OR IGNORE INTO search_request (uuid, image_name)
                 VALUES (?, ?)
-            ''', (uuid, image_name))
+            """,
+                (uuid, image_name),
+            )
             conn.commit()
 
     def save_search_result(self, search_results):
         """Збереження результату пошуку в базу даних."""
         with sqlite3.connect(self.DB_NAME) as conn:
             cursor = conn.cursor()
-            cursor.executemany('''
+            cursor.executemany(
+                """
                 INSERT OR IGNORE INTO search_responce (uuid, search_engine, image_name, image_url, image_text, full_image_name)
                 VALUES (?, ?, ?, ?, ?, ?)
-            ''', (search_results))
+            """,
+                (search_results),
+            )
             conn.commit()
 
     def get_search_history(self):
         """Отримання всіх збережених результатів."""
         with sqlite3.connect(self.DB_NAME) as conn:
             cursor = conn.cursor()
-            cursor.execute('''
+            cursor.execute("""
                         WITH res AS (
                         SELECT uuid, group_concat(search_engine, ';') as search_engines, sum(cnt) as cnt
                             FROM (
@@ -73,5 +79,5 @@ class SqliteDatabaseHelper():
                         LEFT JOIN res 
                         ON req.uuid= res.uuid
                         ORDER BY req.created_at DESC                          
-                           ''')
+                           """)
             return cursor.fetchall()
