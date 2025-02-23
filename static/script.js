@@ -47,7 +47,7 @@ $('body').on('change', inputId, function () {
     
     if (selectedEngines.length < 1){
       isShowPreloader(parentBlock)
-        $(errorBlockId).text("Choose at least one")
+        $(errorBlockId).text("Choose at least one search engine")
         $(errorBlockId).show()
         return 
     } 

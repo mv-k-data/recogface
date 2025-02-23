@@ -2,7 +2,7 @@
     display: flex;
     align-items: flex-start;
     margin-bottom: 15px;
-    cursor: pointer; /* Додаємо курсор для візуалізації клікабельності */
+    cursor: pointer; 
 }
 .result-item img {
     width: 25px;
@@ -18,7 +18,7 @@
 }
 .result-item div a {
     font-size: 12px;
-    display:none; /* Прибираємо видимість посилання */
+    display:none; 
 }
 img{
     max-width: 226px;
